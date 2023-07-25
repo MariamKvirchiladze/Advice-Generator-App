@@ -2,20 +2,37 @@ import mobileimg from "../assets/pattern-divider-mobile.svg";
 import desktopimg from "../assets/pattern-divider-desktop.svg";
 import dice from "../assets/icon-dice.svg";
 import styled from "styled-components";
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+interface types {
+  id: number;
+  advice: string;
+}
 
 const AdviceContainer = (): JSX.Element => {
+  const [adviceInfo, setAdviceInfo] = useState<types | null>(null);
+  const [clicked, setClicked] = useState(false);
+
+  const changeClicked = () => {
+    setClicked(!clicked);
+  };
+
+  useEffect(() => {
+    const getAdvice = async () => {
+      const response = await axios.get("https://api.adviceslip.com/advice");
+      const data = response.data.slip;
+      setAdviceInfo(data);
+    };
+    getAdvice();
+  }, [clicked]);
   return (
     <Container>
-      <h5 className="title">ADVICE # 112</h5>
-      <h2 className="adviceText">
-        “Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat.”
-      </h2>
+      <h5 className="title">ADVICE #{adviceInfo?.id}</h5>
+      <h2 className="adviceText">“{adviceInfo?.advice}”</h2>
       <img className="mobile-divider" src={mobileimg} alt="divider-mobile" />
       <img className="desktop-divider" src={desktopimg} alt="divider-desktop" />
-      <div className="button">
+      <div onClick={changeClicked} className="button">
         <img src={dice} alt="dice-img" />
       </div>
     </Container>
